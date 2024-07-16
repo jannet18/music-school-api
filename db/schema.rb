@@ -10,20 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_07_15_145029) do
+ActiveRecord::Schema[7.0].define(version: 2024_07_15_204905) do
   create_table "users", force: :cascade do |t|
     t.string "email"
     t.string "password_digest"
     t.integer "role"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "name"
     t.date "date_of_birth"
     t.string "grade"
     t.string "guardian_contact"
     t.string "subject_specialization"
     t.string "qualifications"
     t.string "contact_number"
+    t.string "firstname"
+    t.string "lastname"
+    t.boolean "accepted_terms"
   end
 
 end

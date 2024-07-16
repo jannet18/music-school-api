@@ -1,21 +1,27 @@
 class UsersController < ApplicationController
-    skip_before_action :authorize_admin, only: [:index]
+    # skip_before_action :authorize_admin, only: [:index]
     def index
         @users = User.all
-        render json: @users
+        render json: {users: @users}
     end
 
     def show
         @user = User.find(params[:id])
-        render json @user
+        render json: @user
     end
 
     def create
+        recaptcha_valid = verify_recaptcha(model: @user, secret_key: ENV['RECAPTCHA_SECRET_KEY'] )
+
+        unless recaptcha_valid
+            return render json: {error: "reCAPTCHA verification failed"}, status: :uprocessable_entity
+        end
+        
         @user = User.new(user_params)
         if @user.save
-            render json: {@user, status: :created}
+            render json: {user: @user }, status: :created
         else 
-            render json: {@user.errors}, status: :uprocessable_entity
+            render json: {error: @user.errors.full_messages}, status: :uprocessable_entity
         end
     end
 
@@ -24,8 +30,8 @@ class UsersController < ApplicationController
         params.require(:user).permit(:email, :password, :password_confirmation, :role, :name, :date_of_birth, :grade, :guardian_contact, :subject_specialization, :qualifications, :contact_number)
     end
 
-    def authorize_admin
-        return if current_user.admin?
-        render json; {error: "Not Authorized"}, status: :unauthorized
-    end
+    # def authorize_admin
+    #     return if current_user.admin?
+    #     render json: {error: "Not Authorized"}, status: :unauthorized
+    # end
 end
